@@ -26,6 +26,7 @@ class PhpcrSearchController implements SearchInterface
     protected $pageParameterKey;
     protected $queryParameterKey;
     protected $searchRoute;
+    // TODO make configurable
     protected $prefix = '/cms/routes';
 
     /**
@@ -83,6 +84,7 @@ class PhpcrSearchController implements SearchInterface
             $qb = $dm->createQueryBuilder();
             $factory = $qb->getQOMFactory();
 
+            // TODO omly search in the prefix
             $qb->select('title')
                 ->addSelect('body')
                 ->addSelect('jcr:uuid')
@@ -95,6 +97,7 @@ class PhpcrSearchController implements SearchInterface
 
             if (2 === strlen($lang)) {
                 // TODO: check if we can/must validate lang
+                // TODO: fix the filtering by language
 //                $qb->where($factory->comparison($factory->nodeName(), '=', $factory->literal("phpcr_locale:".$lang)));
             }
 
