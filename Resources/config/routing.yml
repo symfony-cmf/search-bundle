@@ -1,0 +1,4 @@
+search:
+    pattern: /search
+    defaults: { _controller: symfony_cmf_search.phpcr_controller:searchAction }
+

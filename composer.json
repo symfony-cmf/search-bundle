@@ -1,0 +1,23 @@
+{
+    "name": "symfony-cmf/search-bundle",
+    "type": "symfony-bundle",
+    "description": "Symfony SearchBundle",
+    "keywords": ["search", "database"],
+    "homepage": "http://cmf.symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Symfony CMF Community",
+            "homepage": "https://github.com/symfony-cmf/SearchBundle/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.2",
+        "symfony/framework-bundle": "2.1.*",
+        "liip/search-bundle": "dev-master"
+    },
+    "autoload": {
+        "psr-0": { "Symfony\\Cmf\\Bundle\\SearchBundle": "" }
+    },
+    "target-dir": "Symfony/Cmf/Bundle/SearchBundle"
+}

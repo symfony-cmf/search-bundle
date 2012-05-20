@@ -1,0 +1,25 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="symfony_cmf_search.phpcr_controller.class">Symfony\Cmf\Bundle\SearchBundle\Controller\PhpcrSearchController</parameter>
+    </parameters>
+
+    <services>
+        <service id="symfony_cmf_search.phpcr_controller" class="%symfony_cmf_search.phpcr_controller.class%">
+            <argument type="service" id="doctrine_phpcr" />
+            <argument>%symfony_cmf_search.document_manager_name%</argument>
+            <argument type="service" id="symfony_cmf_routing_extra.doctrine_router"/>
+            <argument type="service" id="templating"/>
+            <argument>%liip_search.results_per_page%</argument>
+            <argument>%liip_search.restrict_by_language%</argument>
+            <argument>%liip_search.translation_domain%</argument>
+            <argument>%liip_search.page_param_name%</argument>
+            <argument>%liip_search.query_param_name%</argument>
+            <argument>%liip_search.search_route%</argument>
+        </service>
+    </services>
+</container>
