@@ -15,7 +15,6 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 
 class PhpcrSearchController implements SearchInterface
 {
-
     protected $manager;
     protected $managerName;
     protected $router;
@@ -119,7 +118,6 @@ class PhpcrSearchController implements SearchInterface
                 );
             }
         } catch(\Exception $e) {
-var_dump($e->getMessage()); die;
             return new Response($this->templating->render('LiipSearchBundle:Search:failure.html.twig', array('searchTerm' => $query)));
         }
 

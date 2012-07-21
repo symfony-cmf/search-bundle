@@ -12,7 +12,7 @@
         <service id="symfony_cmf_search.phpcr_controller" class="%symfony_cmf_search.phpcr_controller.class%">
             <argument type="service" id="doctrine_phpcr" />
             <argument>%symfony_cmf_search.document_manager_name%</argument>
-            <argument type="service" id="symfony_cmf_routing_extra.doctrine_router"/>
+            <argument type="service" id="symfony_cmf_routing_extra.dynamic_router"/>
             <argument type="service" id="templating"/>
             <argument>%liip_search.results_per_page%</argument>
             <argument>%liip_search.restrict_by_language%</argument>
