@@ -83,21 +83,34 @@ class PhpcrSearchController implements SearchInterface
             $qb = $dm->createQueryBuilder();
             $factory = $qb->getQOMFactory();
 
-            // TODO omly search in the prefix
-            $qb->select('title')
-                ->addSelect('body')
-                ->addSelect('jcr:uuid')
-                ->addSelect('phpcr:class')
+            // TODO make it possible to configure the search subpath
+            $searchPath = '/cms';
+
+            $qb->select('[jcr:uuid]')
+                ->addSelect('[phpcr:class]')
                 ->from($factory->selector('nt:unstructured'))
-                ->where($factory->fullTextSearch('title', $query))
-                ->orWhere($factory->fullTextSearch('body', $query))
+                ->where($factory->descendantNode($searchPath))
                 ->setFirstResult(($page - 1) * $this->perPage)
                 ->setMaxResults($this->perPage);
 
+            // TODO make search columns configurable
+            $searchFields = array('title' => 'title', 'summary' => 'body');
+
+            $constraint = null;
+            foreach ($searchFields as $key => $field) {
+                $qb->addSelect($field, $key);
+                $newConstraint = $factory->fullTextSearch($field, $query);
+                if (empty($constraint)) {
+                    $constraint = $newConstraint;
+                } else {
+                    $constraint = $factory->orConstraint($constraint, $newConstraint);
+                }
+            }
+            $qb->andWhere($constraint);
+
             if (2 === strlen($lang)) {
-                // TODO: check if we can/must validate lang
-                // TODO: fix the filtering by language
-//                $qb->where($factory->comparison($factory->nodeName(), '=', $factory->literal("phpcr_locale:".$lang)));
+                // TODO: check if we can/must validate lang to prevent evil hacking or accidental breakage
+                $qb->andWhere($factory->comparison($factory->nodeName('[nt:unstructured]'), '=', $factory->literal("phpcr_locale:".$lang)));
             }
 
             $rows = $qb->execute();
@@ -114,10 +127,10 @@ class PhpcrSearchController implements SearchInterface
                 $searchResults[$uuid] = array(
                     'url' => $this->router->generate(null, array('content_id' => $uuid)),
                     'title' => $row->getValue('title'),
-                    'summary' => substr($row->getValue('body'), 0, 100),
+                    'summary' => substr($row->getValue('summary'), 0, 100),
                 );
             }
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             return new Response($this->templating->render('LiipSearchBundle:Search:failure.html.twig', array('searchTerm' => $query)));
         }
 
