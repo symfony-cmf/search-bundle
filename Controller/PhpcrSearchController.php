@@ -26,7 +26,9 @@ class PhpcrSearchController implements SearchInterface
     protected $queryParameterKey;
     protected $searchRoute;
     // TODO make configurable
-    protected $prefix = '/cms/routes';
+    protected $searchFields = array('title' => 'title', 'summary' => 'body');
+    // TODO make configurable
+    protected $searchPath = '/cms/content';
 
     /**
      * @param Doctrine\Common\Persistence\ManagerRegistry $manager
@@ -77,74 +79,78 @@ class PhpcrSearchController implements SearchInterface
 
         $lang = $this->queryLanguage($lang, $request);
 
-        try {
+        if ('' !== $query) {
             $dm = $this->manager->getManager($this->managerName);
-
             $qb = $dm->createQueryBuilder();
-            $factory = $qb->getQOMFactory();
-
-            // TODO make it possible to configure the search subpath
-            $searchPath = '/cms';
-
-            $qb->select('[jcr:uuid]')
-                ->addSelect('[phpcr:class]')
-                ->from($factory->selector('nt:unstructured'))
-                ->where($factory->descendantNode($searchPath))
-                ->setFirstResult(($page - 1) * $this->perPage)
-                ->setMaxResults($this->perPage);
-
-            // TODO make search columns configurable
-            $searchFields = array('title' => 'title', 'summary' => 'body');
-
-            $constraint = null;
-            foreach ($searchFields as $key => $field) {
-                $qb->addSelect($field, $key);
-                $newConstraint = $factory->fullTextSearch($field, $query);
-                if (empty($constraint)) {
-                    $constraint = $newConstraint;
-                } else {
-                    $constraint = $factory->orConstraint($constraint, $newConstraint);
-                }
-            }
-            $qb->andWhere($constraint);
-
-            if (2 === strlen($lang)) {
-                // TODO: check if we can/must validate lang to prevent evil hacking or accidental breakage
-                $qb->andWhere($factory->comparison($factory->nodeName('[nt:unstructured]'), '=', $factory->literal("phpcr_locale:".$lang)));
-            }
-
-            $rows = $qb->execute();
-
+            $this->buildQuery($qb, $query, $page, $lang);
+            $searchResults = $this->buildSearchResults($dm->getPhpcrSession(), $qb->execute());
+        } else {
             $searchResults = array();
-            foreach ($rows as $row) {
-                if (!$row->getValue('phpcr:class')) {
-                    $parent = $dm->getPhpcrSession()->getNode(dirname($row->getPath()));
-                    $uuid = $parent->getIdentifier();
-                } else {
-                    $uuid = $row->getValue('jcr:uuid');
-                }
-
-                $searchResults[$uuid] = array(
-                    'url' => $this->router->generate(null, array('content_id' => $uuid)),
-                    'title' => $row->getValue('title'),
-                    'summary' => substr($row->getValue('summary'), 0, 100),
-                );
-            }
-        } catch (\Exception $e) {
-            return new Response($this->templating->render('LiipSearchBundle:Search:failure.html.twig', array('searchTerm' => $query)));
         }
 
-        return new Response($this->templating->render('LiipSearchBundle:Search:search.html.twig',
-                array(
-                    'searchTerm' => $query,
-                    'searchResults' => $searchResults,
-                    'estimated' => count($searchResults),
-                    'translationDomain' => $this->translationDomain,
-                    'showPaging' => false,
-                    'start' => $page,
-                    'perPage' => $this->perPage,
-                    'searchRoute' => $this->searchRoute,
-                )));
+        $params = array(
+            'searchTerm' => $query,
+            'searchResults' => $searchResults,
+            'estimated' => count($searchResults),
+            'translationDomain' => $this->translationDomain,
+            'showPaging' => false,
+            'start' => $page,
+            'perPage' => $this->perPage,
+            'searchRoute' => $this->searchRoute,
+        );
+
+        return new Response($this->templating->render('LiipSearchBundle:Search:search.html.twig', $params));
+    }
+
+    private function buildQuery($qb, $query, $page, $lang)
+    {
+        $factory = $qb->getQOMFactory();
+
+        $qb->select('[jcr:uuid]')
+            ->addSelect('[phpcr:class]')
+            ->from($factory->selector('nt:unstructured'))
+            ->where($factory->descendantNode($this->searchPath))
+            ->setFirstResult(($page - 1) * $this->perPage)
+            ->setMaxResults($this->perPage);
+
+        $constraint = null;
+        foreach ($this->searchFields as $key => $field) {
+            $qb->addSelect($field, $key);
+            $newConstraint = $factory->fullTextSearch($field, $query);
+            if (empty($constraint)) {
+                $constraint = $newConstraint;
+            } else {
+                $constraint = $factory->orConstraint($constraint, $newConstraint);
+            }
+        }
+        $qb->andWhere($constraint);
+
+        if (2 === strlen($lang)) {
+            // TODO: check if we can/must validate lang to prevent evil hacking or accidental breakage
+            // TODO: make this work depending on the translation strategy (currently only child strategy is supported)
+            $qb->andWhere($factory->comparison($factory->nodeName('[nt:unstructured]'), '=', $factory->literal("phpcr_locale:".$lang)));
+        }
+    }
+
+    private function buildSearchResults($session, $rows)
+    {
+        $searchResults = array();
+        foreach ($rows as $row) {
+            if (!$row->getValue('phpcr:class')) {
+                $parent = $session->getNode(dirname($row->getPath()));
+                $uuid = $parent->getIdentifier();
+            } else {
+                $uuid = $row->getValue('jcr:uuid');
+            }
+
+            $searchResults[$uuid] = array(
+                'url' => $this->router->generate(null, array('content_id' => $uuid)),
+                'title' => $row->getValue('title'),
+                'summary' => substr($row->getValue('summary'), 0, 100),
+            );
+        }
+
+        return $searchResults;
     }
 
     /**
