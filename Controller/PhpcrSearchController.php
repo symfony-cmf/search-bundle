@@ -106,8 +106,8 @@ class PhpcrSearchController implements SearchInterface
     {
         $factory = $qb->getQOMFactory();
 
-        $qb->select('[jcr:uuid]')
-            ->addSelect('[phpcr:class]')
+        $qb->select('jcr:uuid')
+            ->addSelect('phpcr:class')
             ->from($factory->selector('nt:unstructured'))
             ->where($factory->descendantNode($this->searchPath))
             ->setFirstResult(($page - 1) * $this->perPage)
@@ -115,7 +115,7 @@ class PhpcrSearchController implements SearchInterface
 
         $constraint = null;
         foreach ($this->searchFields as $key => $field) {
-            $qb->addSelect($field, $key);
+            $qb->addSelect($field);
             $newConstraint = $factory->fullTextSearch($field, $query);
             if (empty($constraint)) {
                 $constraint = $newConstraint;
@@ -145,8 +145,8 @@ class PhpcrSearchController implements SearchInterface
 
             $searchResults[$uuid] = array(
                 'url' => $this->router->generate(null, array('content_id' => $uuid)),
-                'title' => $row->getValue('title'),
-                'summary' => substr(strip_tags($row->getValue('summary')), 0, 100),
+                'title' => $row->getValue($this->searchFields['title']),
+                'summary' => substr(strip_tags($this->searchFields['summary']), 0, 100),
             );
         }
 
