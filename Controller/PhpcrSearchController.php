@@ -146,7 +146,7 @@ class PhpcrSearchController implements SearchInterface
             $searchResults[$uuid] = array(
                 'url' => $this->router->generate(null, array('content_id' => $uuid)),
                 'title' => $row->getValue($this->searchFields['title']),
-                'summary' => substr(strip_tags($this->searchFields['summary']), 0, 100),
+                'summary' => substr(strip_tags($row->getValue($this->searchFields['summary'])), 0, 100),
             );
         }
 
