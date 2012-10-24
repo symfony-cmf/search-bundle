@@ -25,6 +25,11 @@ class Configuration implements ConfigurationInterface
         $treeBuilder->root('symfony_cmf_search')
             ->children()
                 ->scalarNode('document_manager_name')->defaultValue('default')->end()
+                ->scalarNode('translation_strategy')->defaultNull()->end()
+                ->scalarNode('search_path')->defaultNull()->end()
+                ->arrayNode('search_fields')
+                    ->prototype('scalar')
+                ->end()
         ->end();
 
         return $treeBuilder;

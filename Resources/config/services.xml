@@ -20,6 +20,9 @@
             <argument>%liip_search.page_param_name%</argument>
             <argument>%liip_search.query_param_name%</argument>
             <argument>%liip_search.search_route%</argument>
+            <argument>%symfony_cmf_search.search_path%</argument>
+            <argument>%symfony_cmf_search.search_fields%</argument>
+            <argument>%symfony_cmf_search.translation_strategy%</argument>
         </service>
     </services>
 </container>

@@ -25,35 +25,40 @@ class PhpcrSearchController implements SearchInterface
     protected $pageParameterKey;
     protected $queryParameterKey;
     protected $searchRoute;
-    // TODO make configurable
     protected $searchFields = array('title' => 'title', 'summary' => 'body');
-    // TODO make configurable
     protected $searchPath = '/cms/content';
+    protected $translationStrategy;
 
     /**
-     * @param Doctrine\Common\Persistence\ManagerRegistry $manager
-     * @param string $manager_name
+     * @param Doctrine\Common\Persistence\ManagerRegistry $registry
+     * @param string $managerName
      * @param Symfony\Bundle\FrameworkBundle\Templating\EngineInterface $templating
-     * @param integer $results_per_page
-     * @param boolean $restrict_by_language
-     * @param string $translation_domain
-     * @param string $page_parameter_key parameter name used for page
-     * @param string $query_parameter_key parameter name used for search term
-     * @param string $search_route route used for submitting search query
+     * @param integer $perPage
+     * @param boolean $restrictByLanguage
+     * @param string $translationDomain
+     * @param string $pageParameterKey parameter name used for page
+     * @param string $queryParameterKey parameter name used for search term
+     * @param string $searchRoute route used for submitting search query
+     * @param string $searchPath search path
+     * @param array $searchFields array that contains keys 'title'/'summary' with a mapping to property names to search
+     * @param null|string $translationStrategy null, attribute, child
      */
-    public function __construct(ManagerRegistry $manager, $manager_name, RouterInterface $router, EngineInterface $templating, $results_per_page, $restrict_by_language,
-        $translation_domain, $page_parameter_key, $query_parameter_key, $search_route)
+    public function __construct(ManagerRegistry $registry, $managerName, RouterInterface $router, EngineInterface $templating, $perPage, $restrictByLanguage,
+        $translationDomain, $pageParameterKey, $queryParameterKey, $searchRoute, $searchPath, $searchFields, $translationStrategy)
     {
-        $this->manager = $manager;
-        $this->managerName = $manager_name;
+        $this->registry = $registry;
+        $this->managerName = $managerName;
         $this->router = $router;
         $this->templating = $templating;
-        $this->perPage = $results_per_page;
-        $this->restrictByLanguage = $restrict_by_language;
-        $this->translationDomain = $translation_domain;
-        $this->pageParameterKey = $page_parameter_key;
-        $this->queryParameterKey = $query_parameter_key;
-        $this->searchRoute = $search_route;
+        $this->perPage = $perPage;
+        $this->restrictByLanguage = $restrictByLanguage;
+        $this->translationDomain = $translationDomain;
+        $this->pageParameterKey = $pageParameterKey;
+        $this->queryParameterKey = $queryParameterKey;
+        $this->searchRoute = $searchRoute;
+        $this->searchFields = $searchFields;
+        $this->searchPath = $searchPath;
+        $this->translationStrategy = $translationStrategy;
     }
 
     /**
@@ -80,7 +85,7 @@ class PhpcrSearchController implements SearchInterface
         $lang = $this->queryLanguage($lang, $request);
 
         if ('' !== $query) {
-            $dm = $this->manager->getManager($this->managerName);
+            $dm = $this->registry->getManager($this->managerName);
             $qb = $dm->createQueryBuilder();
             $this->buildQuery($qb, $query, $page, $lang);
             $searchResults = $this->buildSearchResults($dm->getPhpcrSession(), $qb->execute());
@@ -114,7 +119,10 @@ class PhpcrSearchController implements SearchInterface
             ->setMaxResults($this->perPage);
 
         $constraint = null;
-        foreach ($this->searchFields as $key => $field) {
+        foreach ($this->searchFields as $field) {
+            if (2 === strlen($lang) && 'attribute' === $this->translationStrategy) {
+
+            }
             $qb->addSelect($field);
             $newConstraint = $factory->fullTextSearch($field, $query);
             if (empty($constraint)) {
@@ -125,9 +133,8 @@ class PhpcrSearchController implements SearchInterface
         }
         $qb->andWhere($constraint);
 
-        if (2 === strlen($lang)) {
+        if (2 === strlen($lang) && 'child' === $this->translationStrategy) {
             // TODO: check if we can/must validate lang to prevent evil hacking or accidental breakage
-            // TODO: make this work depending on the translation strategy (currently only child strategy is supported)
             $qb->andWhere($factory->comparison($factory->nodeName('[nt:unstructured]'), '=', $factory->literal("phpcr_locale:".$lang)));
         }
     }
@@ -138,13 +145,13 @@ class PhpcrSearchController implements SearchInterface
         foreach ($rows as $row) {
             if (!$row->getValue('phpcr:class')) {
                 $parent = $session->getNode(dirname($row->getPath()));
-                $uuid = $parent->getIdentifier();
+                $contentId = $parent->getIdentifier();
             } else {
-                $uuid = $row->getValue('jcr:uuid');
+                $contentId = $row->getValue('jcr:uuid') ? $row->getValue('jcr:uuid') : $row->getPath();
             }
 
-            $searchResults[$uuid] = array(
-                'url' => $this->router->generate(null, array('content_id' => $uuid)),
+            $searchResults[$contentId] = array(
+                'url' => $this->router->generate(null, array('content_id' => $contentId)),
                 'title' => $row->getValue($this->searchFields['title']),
                 'summary' => substr(strip_tags($row->getValue($this->searchFields['summary'])), 0, 100),
             );

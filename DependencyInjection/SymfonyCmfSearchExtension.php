@@ -18,6 +18,17 @@ class SymfonyCmfSearchExtension extends Extension
 
         $config = $this->processConfiguration(new Configuration(), $configs);
         $container->setParameter($this->getAlias().'.document_manager_name', $config['document_manager_name']);
+        $searchPath = $config['search_path'];
+        if (null === $searchPath) {
+            if ($container->hasParameter('symfony_cmf_core.content_basepath')) {
+                $searchPath = $container->getParameter('symfony_cmf_core.content_basepath');
+            } else {
+                $searchPath = '/cms/content';
+            }
+        }
+        $container->setParameter($this->getAlias() . '.search_path', $searchPath);
+        $container->setParameter($this->getAlias().'.search_fields', $config['search_fields']);
+        $container->setParameter($this->getAlias().'.translation_strategy', $config['translation_strategy']);
 
         $loader->load('services.xml');
     }
