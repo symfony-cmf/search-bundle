@@ -85,6 +85,7 @@ class PhpcrSearchController implements SearchInterface
         $lang = $this->queryLanguage($lang, $request);
 
         if ('' !== $query) {
+            /** @var $dm \Doctrine\ODM\PHPCR\DocumentManager */
             $dm = $this->registry->getManager($this->managerName);
             $qb = $dm->createQueryBuilder();
             $this->buildQuery($qb, $query, $page, $lang);
@@ -107,6 +108,12 @@ class PhpcrSearchController implements SearchInterface
         return new Response($this->templating->render('LiipSearchBundle:Search:search.html.twig', $params));
     }
 
+    /**
+     * @param \PHPCR\Util\QOM\QueryBuilder $qb
+     * @param $query
+     * @param integer $page
+     * @param string $lang
+     */
     private function buildQuery($qb, $query, $page, $lang)
     {
         $factory = $qb->getQOMFactory();
