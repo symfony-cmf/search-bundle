@@ -8,6 +8,8 @@ use Symfony\Component\Routing\RouterInterface;
 
 use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 
+use PHPCR\Util\QOM\QueryBuilder;
+
 use Liip\SearchBundle\SearchInterface;
 use Liip\SearchBundle\Helper\SearchParams;
 
@@ -30,9 +32,9 @@ class PhpcrSearchController implements SearchInterface
     protected $translationStrategy;
 
     /**
-     * @param Doctrine\Common\Persistence\ManagerRegistry $registry
+     * @param ManagerRegistry $registry
      * @param string $managerName
-     * @param Symfony\Bundle\FrameworkBundle\Templating\EngineInterface $templating
+     * @param EngineInterface $templating
      * @param integer $perPage
      * @param boolean $restrictByLanguage
      * @param string $translationDomain
@@ -63,12 +65,14 @@ class PhpcrSearchController implements SearchInterface
 
     /**
      * Search method
+     *
      * @param mixed $query string current search query or null
      * @param mixed $page string current result page to show or null
      * @param mixed $lang string language to use for restricting search results, or null
      * @param array $options any options which should be passed along to underlying search engine
-     * @param \Symfony\Component\HttpFoundation\Request current request object, will be automatically injected by symfony when called as an action
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @param Request current request object, will be automatically injected by symfony when called as an action
+     *
+     * @return Response
      */
     public function searchAction($query = null, $page = null, $lang = null, $options = array(), Request $request = null)
     {
@@ -87,7 +91,8 @@ class PhpcrSearchController implements SearchInterface
         if ('' !== $query) {
             /** @var $dm \Doctrine\ODM\PHPCR\DocumentManager */
             $dm = $this->registry->getManager($this->managerName);
-            $qb = $dm->createQueryBuilder();
+            // TODO: use createQueryBuilder to use the ODM builder once it has all features we need
+            $qb = $dm->createPhpcrQueryBuilder();
             $this->buildQuery($qb, $query, $page, $lang);
             $searchResults = $this->buildSearchResults($dm->getPhpcrSession(), $qb->execute());
         } else {
@@ -109,12 +114,12 @@ class PhpcrSearchController implements SearchInterface
     }
 
     /**
-     * @param \PHPCR\Util\QOM\QueryBuilder $qb
+     * @param QueryBuilder $qb
      * @param $query
      * @param integer $page
      * @param string $lang
      */
-    private function buildQuery($qb, $query, $page, $lang)
+    private function buildQuery(QueryBuilder $qb, $query, $page, $lang)
     {
         $factory = $qb->getQOMFactory();
 
@@ -170,6 +175,7 @@ class PhpcrSearchController implements SearchInterface
     /**
      * Determine language used to restrict search results, if one should be used at all.
      * If $this->restrictByLanguage is false, this will return false.
+     *
      * @return mixed string(=locale) or bool(=false)
      */
     public function queryLanguage($lang = null, Request $request)
