@@ -4,7 +4,11 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://symfony.com/schema/routing http://symfony.com/schema/routing/routing-1.0.xsd">
 
-    <route id="search" pattern="/search">
+    <route id="liip_search" pattern="/search">
         <default key="_controller">symfony_cmf_search.phpcr_controller:searchAction</default>
+    </route>
+
+    <route id="liip_searchbox" pattern="/searchbox">
+        <default key="_controller">liip_search_default_controller:showSearchBoxAction</default>
     </route>
 </routes>
