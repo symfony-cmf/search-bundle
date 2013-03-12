@@ -19,5 +19,10 @@
     "autoload": {
         "psr-0": { "Symfony\\Cmf\\Bundle\\SearchBundle": "" }
     },
-    "target-dir": "Symfony/Cmf/Bundle/SearchBundle"
+    "target-dir": "Symfony/Cmf/Bundle/SearchBundle",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0-dev"
+        }
+    }
 }
