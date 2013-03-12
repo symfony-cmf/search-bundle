@@ -27,6 +27,7 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('document_manager_name')->defaultValue('default')->end()
                 ->scalarNode('translation_strategy')->defaultNull()->end()
                 ->scalarNode('search_path')->defaultNull()->end()
+                ->booleanNode('show_paging')->defaultFalse()->end()
                 ->arrayNode('search_fields')
                     ->prototype('scalar')
                 ->end()

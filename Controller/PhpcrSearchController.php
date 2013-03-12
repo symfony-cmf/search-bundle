@@ -5,10 +5,15 @@ namespace Symfony\Cmf\Bundle\SearchBundle\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
 use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 
+use Symfony\Cmf\Component\Routing\RouteAwareInterface;
+
 use PHPCR\Util\QOM\QueryBuilder;
+use PHPCR\SessionInterface;
+use PHPCR\Query\QueryResultInterface;
 
 use Liip\SearchBundle\SearchInterface;
 use Liip\SearchBundle\Helper\SearchParams;
@@ -21,6 +26,7 @@ class PhpcrSearchController implements SearchInterface
     protected $managerName;
     protected $router;
     protected $templating;
+    protected $showPaging;
     protected $perPage;
     protected $restrictByLanguage;
     protected $translationDomain;
@@ -35,6 +41,7 @@ class PhpcrSearchController implements SearchInterface
      * @param ManagerRegistry $registry
      * @param string $managerName
      * @param EngineInterface $templating
+     * @param boolean $showPaging
      * @param integer $perPage
      * @param boolean $restrictByLanguage
      * @param string $translationDomain
@@ -45,13 +52,14 @@ class PhpcrSearchController implements SearchInterface
      * @param array $searchFields array that contains keys 'title'/'summary' with a mapping to property names to search
      * @param null|string $translationStrategy null, attribute, child
      */
-    public function __construct(ManagerRegistry $registry, $managerName, RouterInterface $router, EngineInterface $templating, $perPage, $restrictByLanguage,
-        $translationDomain, $pageParameterKey, $queryParameterKey, $searchRoute, $searchPath, $searchFields, $translationStrategy)
+    public function __construct(ManagerRegistry $registry, $managerName, RouterInterface $router, EngineInterface $templating, $showPaging, $perPage,
+        $restrictByLanguage, $translationDomain, $pageParameterKey, $queryParameterKey, $searchRoute, $searchPath, $searchFields, $translationStrategy)
     {
         $this->registry = $registry;
         $this->managerName = $managerName;
         $this->router = $router;
         $this->templating = $templating;
+        $this->showPaging = $showPaging;
         $this->perPage = $perPage;
         $this->restrictByLanguage = $restrictByLanguage;
         $this->translationDomain = $translationDomain;
@@ -61,6 +69,7 @@ class PhpcrSearchController implements SearchInterface
         $this->searchFields = $searchFields;
         $this->searchPath = $searchPath;
         $this->translationStrategy = $translationStrategy;
+
     }
 
     /**
@@ -87,6 +96,9 @@ class PhpcrSearchController implements SearchInterface
         }
 
         $lang = $this->queryLanguage($lang, $request);
+        $showPaging = false;
+        $searchResults = array();
+        $estimated = 0;
 
         if ('' !== $query) {
             /** @var $dm \Doctrine\ODM\PHPCR\DocumentManager */
@@ -94,13 +106,18 @@ class PhpcrSearchController implements SearchInterface
             // TODO: use createQueryBuilder to use the ODM builder once it has all features we need
             $qb = $dm->createPhpcrQueryBuilder();
             $this->buildQuery($qb, $query, $page, $lang);
-            $estimated = $this->getEstimated($qb);
+
+            if ($this->showPaging) {
+                $estimated = $this->getEstimated($qb);
+            }
+
             $searchResults = $this->buildSearchResults($dm->getPhpcrSession(), $qb->execute());
-            $showPaging = $estimated > $this->perPage;
-        } else {
-            $searchResults = array();
-            $estimated = 0;
-            $showPaging = false;
+
+            if (!$this->showPaging) {
+                $estimated = count($searchResults);
+            } else {
+                $showPaging = $estimated > $this->perPage;
+            }
         }
 
         $params = array(
@@ -108,7 +125,7 @@ class PhpcrSearchController implements SearchInterface
             'searchResults' => $searchResults,
             'estimated' => $estimated,
             'translationDomain' => $this->translationDomain,
-            'showPaging' => $showPaging,
+            'showPaging' => $this->showPaging ? $showPaging : false,
             'start' => (($page - 1) * $this->perPage) + 1,
             'perPage' => $this->perPage,
             'searchRoute' => $this->searchRoute,
@@ -119,7 +136,7 @@ class PhpcrSearchController implements SearchInterface
 
     /**
      * @param QueryBuilder $qb
-     * @param $query
+     * @param string $query
      * @param integer $page
      * @param string $lang
      */
@@ -155,21 +172,34 @@ class PhpcrSearchController implements SearchInterface
         }
     }
 
-    protected function buildSearchResults($session, $rows)
+    /**
+     * @param SessionInterface $session
+     * @param QueryResultInterface $rows
+     * @return array
+     */
+    protected function buildSearchResults(SessionInterface $session, QueryResultInterface $rows)
     {
         $searchResults = array();
         foreach ($rows as $row) {
             if (!$row->getValue('phpcr:class')) {
                 $parent = $session->getNode(dirname($row->getPath()));
                 $contentId = $parent->getIdentifier();
+                $node = $parent;
             } else {
                 $contentId = $row->getValue('jcr:uuid') ? $row->getValue('jcr:uuid') : $row->getPath();
+                $node = $row->getNode();
+            }
+
+            $phpcrClass = $node->getPropertyValue('phpcr:class');
+
+            if (!is_subclass_of($phpcrClass, 'Symfony\Cmf\Component\Routing\RouteAwareInterface')) {
+                continue;
             }
 
             try {
                 $url = $this->router->generate(null, array('content_id' => $contentId));
-            } catch (\Exception $e) {
-                $url = '#';
+            } catch (RouteNotFoundException $e) {
+                continue;
             }
 
             $searchResults[$contentId] = array(
@@ -182,6 +212,10 @@ class PhpcrSearchController implements SearchInterface
         return $searchResults;
     }
 
+    /**
+     * @param QueryBuilder $qb
+     * @return int
+     */
     protected function getEstimated(QueryBuilder $qb)
     {
         $countQb = clone $qb;
@@ -189,7 +223,7 @@ class PhpcrSearchController implements SearchInterface
         $countQb->setFirstResult(null);
         $countQb->setMaxResults(null);
 
-        return count($countQb->execute()->getRows());
+        return count($countQb->execute()->getNodes());
     }
 
     /**
