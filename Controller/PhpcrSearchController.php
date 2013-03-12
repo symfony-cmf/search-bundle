@@ -94,18 +94,22 @@ class PhpcrSearchController implements SearchInterface
             // TODO: use createQueryBuilder to use the ODM builder once it has all features we need
             $qb = $dm->createPhpcrQueryBuilder();
             $this->buildQuery($qb, $query, $page, $lang);
+            $estimated = $this->getEstimated($qb);
             $searchResults = $this->buildSearchResults($dm->getPhpcrSession(), $qb->execute());
+            $showPaging = $estimated > $this->perPage;
         } else {
             $searchResults = array();
+            $estimated = 0;
+            $showPaging = false;
         }
 
         $params = array(
             'searchTerm' => $query,
             'searchResults' => $searchResults,
-            'estimated' => count($searchResults),
+            'estimated' => $estimated,
             'translationDomain' => $this->translationDomain,
-            'showPaging' => false,
-            'start' => $page,
+            'showPaging' => $showPaging,
+            'start' => (($page - 1) * $this->perPage) + 1,
             'perPage' => $this->perPage,
             'searchRoute' => $this->searchRoute,
         );
@@ -119,7 +123,7 @@ class PhpcrSearchController implements SearchInterface
      * @param integer $page
      * @param string $lang
      */
-    private function buildQuery(QueryBuilder $qb, $query, $page, $lang)
+    protected function buildQuery(QueryBuilder $qb, $query, $page, $lang)
     {
         $factory = $qb->getQOMFactory();
 
@@ -151,7 +155,7 @@ class PhpcrSearchController implements SearchInterface
         }
     }
 
-    private function buildSearchResults($session, $rows)
+    protected function buildSearchResults($session, $rows)
     {
         $searchResults = array();
         foreach ($rows as $row) {
@@ -162,14 +166,30 @@ class PhpcrSearchController implements SearchInterface
                 $contentId = $row->getValue('jcr:uuid') ? $row->getValue('jcr:uuid') : $row->getPath();
             }
 
+            try {
+                $url = $this->router->generate(null, array('content_id' => $contentId));
+            } catch (\Exception $e) {
+                $url = '#';
+            }
+
             $searchResults[$contentId] = array(
-                'url' => $this->router->generate(null, array('content_id' => $contentId)),
+                'url' => $url,
                 'title' => $row->getValue($this->searchFields['title']),
                 'summary' => substr(strip_tags($row->getValue($this->searchFields['summary'])), 0, 100),
             );
         }
 
         return $searchResults;
+    }
+
+    protected function getEstimated(QueryBuilder $qb)
+    {
+        $countQb = clone $qb;
+
+        $countQb->setFirstResult(null);
+        $countQb->setMaxResults(null);
+
+        return count($countQb->execute()->getRows());
     }
 
     /**
