@@ -14,6 +14,7 @@
             <argument>%symfony_cmf_search.document_manager_name%</argument>
             <argument type="service" id="symfony_cmf_routing_extra.dynamic_router"/>
             <argument type="service" id="templating"/>
+            <argument>%symfony_cmf_search.show_paging%</argument>
             <argument>%liip_search.results_per_page%</argument>
             <argument>%liip_search.restrict_by_language%</argument>
             <argument>%liip_search.translation_domain%</argument>

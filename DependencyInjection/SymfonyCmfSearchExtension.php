@@ -29,6 +29,7 @@ class SymfonyCmfSearchExtension extends Extension
         $container->setParameter($this->getAlias() . '.search_path', $searchPath);
         $container->setParameter($this->getAlias().'.search_fields', $config['search_fields']);
         $container->setParameter($this->getAlias().'.translation_strategy', $config['translation_strategy']);
+        $container->setParameter($this->getAlias() . '.show_paging', $config['show_paging']);
 
         $loader->load('services.xml');
     }
