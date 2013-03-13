@@ -14,6 +14,7 @@ use Symfony\Cmf\Component\Routing\RouteAwareInterface;
 use PHPCR\Util\QOM\QueryBuilder;
 use PHPCR\SessionInterface;
 use PHPCR\Query\QueryResultInterface;
+use PHPCR\NodeInterface;
 
 use Liip\SearchBundle\SearchInterface;
 use Liip\SearchBundle\Helper\SearchParams;
@@ -190,15 +191,8 @@ class PhpcrSearchController implements SearchInterface
                 $node = $row->getNode();
             }
 
-            $phpcrClass = $node->getPropertyValue('phpcr:class');
-
-            if (!is_subclass_of($phpcrClass, 'Symfony\Cmf\Component\Routing\RouteAwareInterface')) {
-                continue;
-            }
-
-            try {
-                $url = $this->router->generate(null, array('content_id' => $contentId));
-            } catch (RouteNotFoundException $e) {
+            $url = $this->mapUrl($session, $node);
+            if (false === $url) {
                 continue;
             }
 
@@ -210,6 +204,28 @@ class PhpcrSearchController implements SearchInterface
         }
 
         return $searchResults;
+    }
+
+    /**
+     * @param SessionInterface $session
+     * @param NodeInterface $node
+     * @return bool|string FALSE if not mapped, string if url is mapped
+     */
+    protected function mapUrl(SessionInterface $session, NodeInterface $node)
+    {
+        $phpcrClass = $node->getPropertyValue('phpcr:class');
+
+        if (!is_subclass_of($phpcrClass, 'Symfony\Cmf\Component\Routing\RouteAwareInterface')) {
+            return false;
+        }
+
+        try {
+            $url = $this->router->generate(null, array('content_id' => $node->getIdentifier()));
+        } catch (RouteNotFoundException $e) {
+            return false;
+        }
+
+        return $url;
     }
 
     /**
