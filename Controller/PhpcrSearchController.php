@@ -14,6 +14,7 @@ use Symfony\Cmf\Component\Routing\RouteAwareInterface;
 use PHPCR\Util\QOM\QueryBuilder;
 use PHPCR\SessionInterface;
 use PHPCR\Query\QueryResultInterface;
+use PHPCR\Query\RowInterface;
 use PHPCR\NodeInterface;
 
 use Liip\SearchBundle\SearchInterface;
@@ -199,7 +200,7 @@ class PhpcrSearchController implements SearchInterface
             $searchResults[$contentId] = array(
                 'url' => $url,
                 'title' => $row->getValue($this->searchFields['title']),
-                'summary' => substr(strip_tags($row->getValue($this->searchFields['summary'])), 0, 100),
+                'summary' => $this->buildSummary($row),
             );
         }
 
@@ -226,6 +227,15 @@ class PhpcrSearchController implements SearchInterface
         }
 
         return $url;
+    }
+
+    /**
+     * @param RowInterface $row
+     * @return string
+     */
+    protected function buildSummary(RowInterface $row)
+    {
+        return substr(strip_tags($row->getValue($this->searchFields['summary'])), 0, 100);
     }
 
     /**
