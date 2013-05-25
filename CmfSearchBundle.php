@@ -7,6 +7,6 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 /**
  * Bundle class
  */
-class SymfonyCmfSearchBundle extends Bundle
+class CmfSearchBundle extends Bundle
 {
 }

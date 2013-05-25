@@ -7,7 +7,7 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 
-class SymfonyCmfSearchExtension extends Extension
+class CmfSearchExtension extends Extension
 {
     /**
      * {@inheritDoc}
@@ -20,8 +20,8 @@ class SymfonyCmfSearchExtension extends Extension
         $container->setParameter($this->getAlias().'.document_manager_name', $config['document_manager_name']);
         $searchPath = $config['search_path'];
         if (null === $searchPath) {
-            if ($container->hasParameter('symfony_cmf_core.content_basepath')) {
-                $searchPath = $container->getParameter('symfony_cmf_core.content_basepath');
+            if ($container->hasParameter('cmf_core.content_basepath')) {
+                $searchPath = $container->getParameter('cmf_core.content_basepath');
             } else {
                 $searchPath = '/cms/content';
             }
