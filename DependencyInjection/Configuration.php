@@ -22,7 +22,7 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
-        $treeBuilder->root('symfony_cmf_search')
+        $treeBuilder->root('cmf_search')
             ->children()
                 ->scalarNode('document_manager_name')->defaultValue('default')->end()
                 ->scalarNode('translation_strategy')->defaultNull()->end()

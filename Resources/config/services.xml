@@ -5,25 +5,25 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <parameters>
-        <parameter key="symfony_cmf_search.phpcr_controller.class">Symfony\Cmf\Bundle\SearchBundle\Controller\PhpcrSearchController</parameter>
+        <parameter key="cmf_search.phpcr_controller.class">Symfony\Cmf\Bundle\SearchBundle\Controller\PhpcrSearchController</parameter>
     </parameters>
 
     <services>
-        <service id="symfony_cmf_search.phpcr_controller" class="%symfony_cmf_search.phpcr_controller.class%">
+        <service id="cmf_search.phpcr_controller" class="%cmf_search.phpcr_controller.class%">
             <argument type="service" id="doctrine_phpcr" />
-            <argument>%symfony_cmf_search.document_manager_name%</argument>
-            <argument type="service" id="symfony_cmf_routing.dynamic_router"/>
+            <argument>%cmf_search.document_manager_name%</argument>
+            <argument type="service" id="cmf_routing.dynamic_router"/>
             <argument type="service" id="templating"/>
-            <argument>%symfony_cmf_search.show_paging%</argument>
+            <argument>%cmf_search.show_paging%</argument>
             <argument>%liip_search.results_per_page%</argument>
             <argument>%liip_search.restrict_by_language%</argument>
             <argument>%liip_search.translation_domain%</argument>
             <argument>%liip_search.page_param_name%</argument>
             <argument>%liip_search.query_param_name%</argument>
             <argument>%liip_search.search_route%</argument>
-            <argument>%symfony_cmf_search.search_path%</argument>
-            <argument>%symfony_cmf_search.search_fields%</argument>
-            <argument>%symfony_cmf_search.translation_strategy%</argument>
+            <argument>%cmf_search.search_path%</argument>
+            <argument>%cmf_search.search_fields%</argument>
+            <argument>%cmf_search.translation_strategy%</argument>
         </service>
     </services>
 </container>
