@@ -199,6 +199,7 @@ class PhpcrSearchController implements SearchInterface
 
             $searchResults[$contentId] = array(
                 'url' => $url,
+                'path' => $row->getPath(),
                 'title' => $row->getValue($this->searchFields['title']),
                 'summary' => $this->buildSummary($row),
             );
