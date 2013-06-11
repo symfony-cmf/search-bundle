@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<xsd:schema xmlns="http://cmf.symfony.com/schema/dic/search"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    targetNamespace="http://cmf.symfony.com/schema/dic/search"
+    elementFormDefault="qualified">
+
+    <xsd:element name="config" type="config" />
+
+    <xsd:complexType name="config">
+        <xsd:sequence>
+            <xsd:element name="search-field" type="search_fields" minOccurs="0" />
+        </xsd:sequence>
+
+        <xsd:attribute name="document-manager-name" type="xsd:string" />
+        <xsd:attribute name="translation-strategy" type="xsd:string" />
+        <xsd:attribute name="search-path" type="xsd:string" />
+        <xsd:attribute name="show-paging" type="boolean" />
+    </xsd:complexType>
+
+    <xsd:complexType name="search_fields">
+        <xsd:anyAttribute />
+    </xsd:complexType>
+
+    <xsd:simpleType name="boolean">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="true" />
+            <xsd:enumeration value="false" />
+        </xsd:restriction>
+    </xsd:simpleType>
+</xsd:schema>

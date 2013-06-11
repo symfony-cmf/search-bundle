@@ -23,6 +23,7 @@ class Configuration implements ConfigurationInterface
     {
         $treeBuilder = new TreeBuilder();
         $treeBuilder->root('cmf_search')
+            ->fixXmlConfig('search_field')
             ->children()
                 ->scalarNode('document_manager_name')->defaultValue('default')->end()
                 ->scalarNode('translation_strategy')->defaultNull()->end()
