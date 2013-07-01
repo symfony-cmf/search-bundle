@@ -11,11 +11,12 @@ use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 
 use Symfony\Cmf\Component\Routing\RouteAwareInterface;
 
-use PHPCR\Util\QOM\QueryBuilder;
 use PHPCR\SessionInterface;
+use PHPCR\NodeInterface;
+use PHPCR\Util\PathHelper;
+use PHPCR\Util\QOM\QueryBuilder;
 use PHPCR\Query\QueryResultInterface;
 use PHPCR\Query\RowInterface;
-use PHPCR\NodeInterface;
 
 use Liip\SearchBundle\SearchInterface;
 use Liip\SearchBundle\Helper\SearchParams;
@@ -81,7 +82,7 @@ class PhpcrSearchController implements SearchInterface
      * @param mixed $page string current result page to show or null
      * @param mixed $lang string language to use for restricting search results, or null
      * @param array $options any options which should be passed along to underlying search engine
-     * @param Request current request object, will be automatically injected by symfony when called as an action
+     * @param Request $current request object, will be automatically injected by symfony when called as an action
      *
      * @return Response
      */
@@ -177,14 +178,16 @@ class PhpcrSearchController implements SearchInterface
     /**
      * @param SessionInterface $session
      * @param QueryResultInterface $rows
+     *
      * @return array
      */
     protected function buildSearchResults(SessionInterface $session, QueryResultInterface $rows)
     {
         $searchResults = array();
+        /** @var $row RowInterface */
         foreach ($rows as $row) {
             if (!$row->getValue('phpcr:class')) {
-                $parent = $session->getNode(dirname($row->getPath()));
+                $parent = $session->getNode(PathHelper::getParentPath($row->getPath()));
                 $contentId = $parent->getIdentifier();
                 $node = $parent;
             } else {
