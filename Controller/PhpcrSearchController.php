@@ -9,7 +9,7 @@ use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
 use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 
-use Symfony\Cmf\Component\Routing\RouteAwareInterface;
+use Symfony\Cmf\Component\Routing\RouteReferrersInterface;
 
 use PHPCR\SessionInterface;
 use PHPCR\NodeInterface;
@@ -219,7 +219,7 @@ class PhpcrSearchController implements SearchInterface
     {
         $phpcrClass = $node->getPropertyValue('phpcr:class');
 
-        if (!is_subclass_of($phpcrClass, 'Symfony\Cmf\Component\Routing\RouteAwareInterface')) {
+        if (!is_subclass_of($phpcrClass, 'Symfony\Cmf\Component\Routing\RouteReferrersInterface')) {
             return false;
         }
 
