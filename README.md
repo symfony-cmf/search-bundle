@@ -15,7 +15,7 @@ to provide a search capability for a PHPCR repository.
 ## Requirements
 
 * Symfony >= 2.1
-* [PHPCR](https://github.com/phpcr/phpcr)
+* [Doctrine PHPCR-ODM](http://symfony.com/doc/master/cmf/tutorials/installing_configuring_doctrine_phpcr_odm.html)
 * See also the `require` section of [composer.json](composer.json)
 
 
