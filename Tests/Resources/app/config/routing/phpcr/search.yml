@@ -1,0 +1,3 @@
+phpcr_search:
+    resource: "@CmfSearchBundle/Resources/config/routing/phpcr/search.xml"
+    prefix:   /
