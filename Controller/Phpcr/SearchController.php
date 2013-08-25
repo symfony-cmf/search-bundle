@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Cmf\Bundle\SearchBundle\Controller;
+namespace Symfony\Cmf\Bundle\SearchBundle\Controller\Phpcr;
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,7 +23,7 @@ use Liip\SearchBundle\Helper\SearchParams;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 
-class PhpcrSearchController implements SearchInterface
+class SearchController implements SearchInterface
 {
     protected $manager;
     protected $managerName;
