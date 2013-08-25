@@ -11,10 +11,16 @@
             "homepage": "https://github.com/symfony-cmf/SearchBundle/contributors"
         }
     ],
+    "minimum-stability": "dev",
     "require": {
         "php": ">=5.3.3",
-        "symfony/framework-bundle": "~2.1",
-        "liip/search-bundle": "~1.0.0"
+        "symfony/framework-bundle": "~2.2",
+        "liip/search-bundle": "~1.0.0",
+        "doctrine/phpcr-odm": "~1.0.0",
+        "symfony-cmf/routing": "~1.0.0"
+    },
+    "require-dev": {
+         "symfony-cmf/testing": "1.0.*"
     },
     "autoload": {
         "psr-0": { "Symfony\\Cmf\\Bundle\\SearchBundle": "" }
