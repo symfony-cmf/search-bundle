@@ -1,3 +1,5 @@
-phpunit.xml
+Tests/Resources/app/cache
+Tests/Resources/app/logs
 composer.lock
-/vendor/
+phpunit.xml
+vendor
