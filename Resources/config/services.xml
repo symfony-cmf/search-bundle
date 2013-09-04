@@ -10,8 +10,8 @@
 
     <services>
         <service id="cmf_search.phpcr_controller" class="%cmf_search.phpcr_controller.class%">
-            <argument type="service" id="doctrine_phpcr" />
-            <argument>%cmf_search.document_manager_name%</argument>
+            <argument />
+            <argument>%cmf_search.persistence.phpcr.manager_name%</argument>
             <argument type="service" id="cmf_routing.dynamic_router"/>
             <argument type="service" id="templating"/>
             <argument>%cmf_search.show_paging%</argument>
@@ -21,9 +21,9 @@
             <argument>%liip_search.page_param_name%</argument>
             <argument>%liip_search.query_param_name%</argument>
             <argument>%liip_search.search_route%</argument>
-            <argument>%cmf_search.search_path%</argument>
-            <argument>%cmf_search.search_fields%</argument>
-            <argument>%cmf_search.translation_strategy%</argument>
+            <argument>%cmf_search.persistence.phpcr.search_basepath%</argument>
+            <argument>%cmf_search.persistence.phpcr.search_fields%</argument>
+            <argument>%cmf_search.persistence.phpcr.translation_strategy%</argument>
         </service>
     </services>
 </container>
