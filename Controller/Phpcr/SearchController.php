@@ -147,10 +147,10 @@ class SearchController implements SearchInterface
     {
         $factory = $qb->getQOMFactory();
 
-        $qb->select('jcr:uuid')
-            ->addSelect('phpcr:class')
-            ->from($factory->selector('nt:unstructured'))
-            ->where($factory->descendantNode($this->searchPath))
+        $qb->select('a', 'jcr:uuid', 'jcr:uuid')
+            ->addSelect('a', 'phpcr:class', 'phpcr:class')
+            ->from($factory->selector('a', 'nt:unstructured'))
+            ->where($factory->descendantNode('a', $this->searchPath))
             ->setFirstResult(($page - 1) * $this->perPage)
             ->setMaxResults($this->perPage);
 
@@ -159,8 +159,8 @@ class SearchController implements SearchInterface
             if (2 === strlen($lang) && 'attribute' === $this->translationStrategy) {
 
             }
-            $qb->addSelect($field);
-            $newConstraint = $factory->fullTextSearch($field, $query);
+            $qb->addSelect('a', $field, $field);
+            $newConstraint = $factory->fullTextSearch('a', $field, $query);
             if (empty($constraint)) {
                 $constraint = $newConstraint;
             } else {
@@ -171,7 +171,7 @@ class SearchController implements SearchInterface
 
         if (2 === strlen($lang) && 'child' === $this->translationStrategy) {
             // TODO: check if we can/must validate lang to prevent evil hacking or accidental breakage
-            $qb->andWhere($factory->comparison($factory->nodeName('[nt:unstructured]'), '=', $factory->literal("phpcr_locale:".$lang)));
+            $qb->andWhere($factory->comparison($factory->nodeName('a'), '=', $factory->literal("phpcr_locale:".$lang)));
         }
     }
 
