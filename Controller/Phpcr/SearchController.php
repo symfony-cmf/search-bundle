@@ -82,7 +82,6 @@ class SearchController implements SearchInterface
         $this->searchFields = $searchFields;
         $this->searchPath = $searchPath;
         $this->translationStrategy = $translationStrategy;
-
     }
 
     /**
@@ -116,7 +115,7 @@ class SearchController implements SearchInterface
         if ('' !== $query) {
             /** @var $dm \Doctrine\ODM\PHPCR\DocumentManager */
             $dm = $this->registry->getManager($this->managerName);
-            // TODO: use createQueryBuilder to use the ODM builder once it has all features we need
+            // TODO: use createQueryBuilder to use the ODM builder
             $qb = $dm->createPhpcrQueryBuilder();
             $this->buildQuery($qb, $query, $page, $lang);
 
@@ -157,8 +156,8 @@ class SearchController implements SearchInterface
     {
         $factory = $qb->getQOMFactory();
 
-        $qb->select('a', 'jcr:uuid', 'jcr:uuid')
-            ->addSelect('a', 'phpcr:class', 'phpcr:class')
+        $qb->select('a', 'jcr:uuid', 'uuid')
+            ->addSelect('a', 'phpcr:class', 'class')
             ->from($factory->selector('a', 'nt:unstructured'))
             ->where($factory->descendantNode('a', $this->searchPath))
             ->setFirstResult(($page - 1) * $this->perPage)
@@ -166,10 +165,11 @@ class SearchController implements SearchInterface
 
         $constraint = null;
         foreach ($this->searchFields as $field) {
+            $column = $field;
             if (2 === strlen($lang) && 'attribute' === $this->translationStrategy) {
-
+                $field = "phpcr_locale:$lang-$field";
             }
-            $qb->addSelect('a', $field, $field);
+            $qb->addSelect('a', $field, $column);
             $newConstraint = $factory->fullTextSearch('a', $field, $query);
             if (empty($constraint)) {
                 $constraint = $newConstraint;
@@ -196,12 +196,12 @@ class SearchController implements SearchInterface
         $searchResults = array();
         /** @var $row RowInterface */
         foreach ($rows as $row) {
-            if (!$row->getValue('phpcr:class')) {
+            if (!$row->getValue('class')) {
                 $parent = $session->getNode(PathHelper::getParentPath($row->getPath()));
                 $contentId = $parent->getIdentifier();
                 $node = $parent;
             } else {
-                $contentId = $row->getValue('jcr:uuid') ? $row->getValue('jcr:uuid') : $row->getPath();
+                $contentId = $row->getValue('uuid') ?: $row->getPath();
                 $node = $row->getNode();
             }
 
