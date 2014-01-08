@@ -1,0 +1,15 @@
+<config xmlns="http://cmf.symfony.com/schema/dic/search"
+    show-paging="true"
+>
+    <persistence>
+        <phpcr
+            search-basepath="/cms/content"
+            manager-registry="doctrine_phpcr"
+            manager-name="default"
+            translation-strategy="attribute"
+        >
+            <search-field>title</search-field>
+            <search-field>body</search-field>
+        </phpcr>
+    </persistence>
+</config>
