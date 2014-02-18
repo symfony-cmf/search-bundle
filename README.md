@@ -23,7 +23,7 @@ to provide a search capability for a PHPCR repository.
 
 For the install guide and reference, see:
 
-* [SearchBundle documentation](http://symfony.com/doc/master/cmf/bundles/search.html)
+* [SearchBundle documentation](http://symfony.com/doc/master/cmf/bundles/search/introduction.html)
 
 See also:
 
