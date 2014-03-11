@@ -15,9 +15,9 @@
     "require": {
         "php": ">=5.3.3",
         "symfony/framework-bundle": "~2.2",
-        "liip/search-bundle": "1.0.*",
-        "doctrine/phpcr-odm": "1.0.*",
-        "symfony-cmf/routing-bundle": "1.1.*"
+        "liip/search-bundle": "~1.0",
+        "doctrine/phpcr-odm": "~1.0",
+        "symfony-cmf/routing-bundle": "~1.1"
     },
     "require-dev": {
          "symfony-cmf/testing": "1.1.*"
@@ -28,7 +28,7 @@
     "target-dir": "Symfony/Cmf/Bundle/SearchBundle",
     "extra": {
         "branch-alias": {
-            "dev-master": "1.0-dev"
+            "dev-master": "1.1-dev"
         }
     }
 }
