@@ -14,7 +14,7 @@
     "minimum-stability": "dev",
     "require": {
         "php": ">=5.3.3",
-        "symfony/framework-bundle": "~2.2",
+        "symfony/framework-bundle": "~2.3",
         "liip/search-bundle": "~1.0",
         "doctrine/phpcr-odm": "~1.0",
         "symfony-cmf/routing-bundle": "~1.1"
