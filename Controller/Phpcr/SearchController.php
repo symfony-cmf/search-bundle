@@ -9,7 +9,6 @@
  * file that was distributed with this source code.
  */
 
-
 namespace Symfony\Cmf\Bundle\SearchBundle\Controller\Phpcr;
 
 use Symfony\Component\HttpFoundation\Response;
@@ -52,18 +51,18 @@ class SearchController implements SearchInterface
 
     /**
      * @param ManagerRegistry $registry
-     * @param string $managerName
+     * @param string          $managerName
      * @param EngineInterface $templating
-     * @param boolean $showPaging
-     * @param integer $perPage
-     * @param boolean $restrictByLanguage
-     * @param string $translationDomain
-     * @param string $pageParameterKey parameter name used for page
-     * @param string $queryParameterKey parameter name used for search term
-     * @param string $searchRoute route used for submitting search query
-     * @param string $searchPath search path
-     * @param array $searchFields array that contains keys 'title'/'summary' with a mapping to property names to search
-     * @param null|string $translationStrategy null, attribute, child
+     * @param boolean         $showPaging
+     * @param integer         $perPage
+     * @param boolean         $restrictByLanguage
+     * @param string          $translationDomain
+     * @param string          $pageParameterKey    parameter name used for page
+     * @param string          $queryParameterKey   parameter name used for search term
+     * @param string          $searchRoute         route used for submitting search query
+     * @param string          $searchPath          search path
+     * @param array           $searchFields        array that contains keys 'title'/'summary' with a mapping to property names to search
+     * @param null|string     $translationStrategy null, attribute, child
      */
     public function __construct(ManagerRegistry $registry, $managerName, RouterInterface $router, EngineInterface $templating, $showPaging, $perPage,
         $restrictByLanguage, $translationDomain, $pageParameterKey, $queryParameterKey, $searchRoute, $searchPath, $searchFields, $translationStrategy)
@@ -87,10 +86,10 @@ class SearchController implements SearchInterface
     /**
      * Search method
      *
-     * @param mixed $query string current search query or null
-     * @param mixed $page string current result page to show or null
-     * @param mixed $lang string language to use for restricting search results, or null
-     * @param array $options any options which should be passed along to underlying search engine
+     * @param mixed   $query   string current search query or null
+     * @param mixed   $page    string current result page to show or null
+     * @param mixed   $lang    string language to use for restricting search results, or null
+     * @param array   $options any options which should be passed along to underlying search engine
      * @param Request $current request object, will be automatically injected by symfony when called as an action
      *
      * @return Response
@@ -148,9 +147,9 @@ class SearchController implements SearchInterface
 
     /**
      * @param QueryBuilder $qb
-     * @param string $query
-     * @param integer $page
-     * @param string $lang
+     * @param string       $query
+     * @param integer      $page
+     * @param string       $lang
      */
     protected function buildQuery(QueryBuilder $qb, $query, $page, $lang)
     {
@@ -186,7 +185,7 @@ class SearchController implements SearchInterface
     }
 
     /**
-     * @param SessionInterface $session
+     * @param SessionInterface     $session
      * @param QueryResultInterface $rows
      *
      * @return array
@@ -221,9 +220,9 @@ class SearchController implements SearchInterface
     }
 
     /**
-     * @param SessionInterface $session
-     * @param NodeInterface $node
-     * @return bool|string FALSE if not mapped, string if url is mapped
+     * @param  SessionInterface $session
+     * @param  NodeInterface    $node
+     * @return bool|string      FALSE if not mapped, string if url is mapped
      */
     protected function mapUrl(SessionInterface $session, NodeInterface $node)
     {
@@ -243,7 +242,7 @@ class SearchController implements SearchInterface
     }
 
     /**
-     * @param RowInterface $row
+     * @param  RowInterface $row
      * @return string
      */
     protected function buildSummary(RowInterface $row)
@@ -252,7 +251,7 @@ class SearchController implements SearchInterface
     }
 
     /**
-     * @param QueryBuilder $qb
+     * @param  QueryBuilder $qb
      * @return int
      */
     protected function getEstimated(QueryBuilder $qb)
