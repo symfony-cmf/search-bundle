@@ -48,10 +48,12 @@ class SearchController implements SearchInterface
     protected $searchFields = array('title' => 'title', 'summary' => 'body');
     protected $searchPath = '/cms/content';
     protected $translationStrategy;
+    protected $maxResults;
 
     /**
      * @param ManagerRegistry $registry
      * @param string          $managerName
+     * @param RouterInterface $router
      * @param EngineInterface $templating
      * @param boolean         $showPaging
      * @param integer         $perPage
@@ -63,9 +65,10 @@ class SearchController implements SearchInterface
      * @param string          $searchPath          search path
      * @param array           $searchFields        array that contains keys 'title'/'summary' with a mapping to property names to search
      * @param null|string     $translationStrategy null, attribute, child
+     * @param null|integer    $maxResults          limit number of results
      */
     public function __construct(ManagerRegistry $registry, $managerName, RouterInterface $router, EngineInterface $templating, $showPaging, $perPage,
-        $restrictByLanguage, $translationDomain, $pageParameterKey, $queryParameterKey, $searchRoute, $searchPath, $searchFields, $translationStrategy)
+        $restrictByLanguage, $translationDomain, $pageParameterKey, $queryParameterKey, $searchRoute, $searchPath, $searchFields, $translationStrategy, $maxResults = null)
     {
         $this->registry = $registry;
         $this->managerName = $managerName;
@@ -81,6 +84,7 @@ class SearchController implements SearchInterface
         $this->searchFields = $searchFields;
         $this->searchPath = $searchPath;
         $this->translationStrategy = $translationStrategy;
+        $this->maxResults = $maxResults;
     }
 
     /**
@@ -90,7 +94,7 @@ class SearchController implements SearchInterface
      * @param mixed   $page    string current result page to show or null
      * @param mixed   $lang    string language to use for restricting search results, or null
      * @param array   $options any options which should be passed along to underlying search engine
-     * @param Request $current request object, will be automatically injected by symfony when called as an action
+     * @param Request $request request object, will be automatically injected by symfony when called as an action
      *
      * @return Response
      */
@@ -259,7 +263,7 @@ class SearchController implements SearchInterface
         $countQb = clone $qb;
 
         $countQb->setFirstResult(null);
-        $countQb->setMaxResults(null);
+        $countQb->setMaxResults($this->maxResults);
 
         return count($countQb->execute()->getNodes());
     }
@@ -268,6 +272,8 @@ class SearchController implements SearchInterface
      * Determine language used to restrict search results, if one should be used at all.
      * If $this->restrictByLanguage is false, this will return false.
      *
+     * @param null $lang
+     * @param Request $request
      * @return mixed string(=locale) or bool(=false)
      */
     public function queryLanguage($lang = null, Request $request)

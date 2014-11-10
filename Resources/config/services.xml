@@ -24,6 +24,7 @@
             <argument>%cmf_search.persistence.phpcr.search_basepath%</argument>
             <argument>%cmf_search.persistence.phpcr.search_fields%</argument>
             <argument>%cmf_search.persistence.phpcr.translation_strategy%</argument>
+            <argument>%cmf_search.max_results%</argument>
         </service>
     </services>
 </container>

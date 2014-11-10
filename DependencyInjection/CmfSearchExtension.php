@@ -28,6 +28,7 @@ class CmfSearchExtension extends Extension
 
         $config = $this->processConfiguration(new Configuration(), $configs);
         $container->setParameter($this->getAlias() . '.show_paging', $config['show_paging']);
+        $container->setParameter($this->getAlias() . '.max_results', $config['max_results']);
 
         if ($config['persistence']['phpcr']) {
             $loader->load('services.xml');
