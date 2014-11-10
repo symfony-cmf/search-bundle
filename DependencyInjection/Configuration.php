@@ -31,6 +31,7 @@ class Configuration implements ConfigurationInterface
         $treeBuilder->root('cmf_search')
             ->children()
                 ->booleanNode('show_paging')->defaultFalse()->end()
+                ->integerNode('max_results')->defaultNull()->end()
                 ->arrayNode('persistence')
                     ->addDefaultsIfNotSet()
                     ->children()
