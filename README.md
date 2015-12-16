@@ -1,6 +1,7 @@
 # Symfony CMF Search Bundle
 
 [![Build Status](https://secure.travis-ci.org/symfony-cmf/SearchBundle.png?branch=master)](http://travis-ci.org/symfony-cmf/SearchBundle)
+[![StyleCI](https://styleci.io/repos/4385837/shield)](https://styleci.io/repos/4385837)
 [![Latest Stable Version](https://poser.pugx.org/symfony-cmf/search-bundle/version.png)](https://packagist.org/packages/symfony-cmf/search-bundle)
 [![Total Downloads](https://poser.pugx.org/symfony-cmf/search-bundle/d/total.png)](https://packagist.org/packages/symfony-cmf/search-bundle)
 
