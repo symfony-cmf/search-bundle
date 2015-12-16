@@ -15,21 +15,15 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
-
 use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
-
-use Symfony\Cmf\Component\Routing\RouteReferrersReadInterface;
-
 use PHPCR\SessionInterface;
 use PHPCR\NodeInterface;
 use PHPCR\Util\PathHelper;
 use PHPCR\Util\QOM\QueryBuilder;
 use PHPCR\Query\QueryResultInterface;
 use PHPCR\Query\RowInterface;
-
 use Liip\SearchBundle\SearchInterface;
 use Liip\SearchBundle\Helper\SearchParams;
-
 use Doctrine\Common\Persistence\ManagerRegistry;
 
 class SearchController implements SearchInterface
@@ -55,9 +49,9 @@ class SearchController implements SearchInterface
      * @param string          $managerName
      * @param RouterInterface $router
      * @param EngineInterface $templating
-     * @param boolean         $showPaging
-     * @param integer         $perPage
-     * @param boolean         $restrictByLanguage
+     * @param bool            $showPaging
+     * @param int             $perPage
+     * @param bool            $restrictByLanguage
      * @param string          $translationDomain
      * @param string          $pageParameterKey    parameter name used for page
      * @param string          $queryParameterKey   parameter name used for search term
@@ -65,7 +59,7 @@ class SearchController implements SearchInterface
      * @param string          $searchPath          search path
      * @param array           $searchFields        array that contains keys 'title'/'summary' with a mapping to property names to search
      * @param null|string     $translationStrategy null, attribute, child
-     * @param null|integer    $maxResults          limit number of results
+     * @param null|int        $maxResults          limit number of results
      */
     public function __construct(ManagerRegistry $registry, $managerName, RouterInterface $router, EngineInterface $templating, $showPaging, $perPage,
         $restrictByLanguage, $translationDomain, $pageParameterKey, $queryParameterKey, $searchRoute, $searchPath, $searchFields, $translationStrategy, $maxResults = null)
@@ -88,7 +82,7 @@ class SearchController implements SearchInterface
     }
 
     /**
-     * Search method
+     * Search method.
      *
      * @param mixed   $query   string current search query or null
      * @param mixed   $page    string current result page to show or null
@@ -152,7 +146,7 @@ class SearchController implements SearchInterface
     /**
      * @param QueryBuilder $qb
      * @param string       $query
-     * @param integer      $page
+     * @param int          $page
      * @param string       $lang
      */
     protected function buildQuery(QueryBuilder $qb, $query, $page, $lang)
@@ -184,7 +178,7 @@ class SearchController implements SearchInterface
 
         if (2 === strlen($lang) && 'child' === $this->translationStrategy) {
             // TODO: check if we can/must validate lang to prevent evil hacking or accidental breakage
-            $qb->andWhere($factory->comparison($factory->nodeName('a'), '=', $factory->literal("phpcr_locale:".$lang)));
+            $qb->andWhere($factory->comparison($factory->nodeName('a'), '=', $factory->literal('phpcr_locale:'.$lang)));
         }
     }
 
@@ -224,9 +218,10 @@ class SearchController implements SearchInterface
     }
 
     /**
-     * @param  SessionInterface $session
-     * @param  NodeInterface    $node
-     * @return bool|string      FALSE if not mapped, string if url is mapped
+     * @param SessionInterface $session
+     * @param NodeInterface    $node
+     *
+     * @return bool|string FALSE if not mapped, string if url is mapped
      */
     protected function mapUrl(SessionInterface $session, NodeInterface $node)
     {
@@ -246,7 +241,8 @@ class SearchController implements SearchInterface
     }
 
     /**
-     * @param  RowInterface $row
+     * @param RowInterface $row
+     *
      * @return string
      */
     protected function buildSummary(RowInterface $row)
@@ -255,7 +251,8 @@ class SearchController implements SearchInterface
     }
 
     /**
-     * @param  QueryBuilder $qb
+     * @param QueryBuilder $qb
+     *
      * @return int
      */
     protected function getEstimated(QueryBuilder $qb)
@@ -272,8 +269,9 @@ class SearchController implements SearchInterface
      * Determine language used to restrict search results, if one should be used at all.
      * If $this->restrictByLanguage is false, this will return false.
      *
-     * @param null $lang
+     * @param null    $lang
      * @param Request $request
+     *
      * @return mixed string(=locale) or bool(=false)
      */
     public function queryLanguage($lang = null, Request $request)

@@ -20,15 +20,15 @@ use Symfony\Component\Config\FileLocator;
 class CmfSearchExtension extends Extension
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function load(array $configs, ContainerBuilder $container)
     {
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
 
         $config = $this->processConfiguration(new Configuration(), $configs);
-        $container->setParameter($this->getAlias() . '.show_paging', $config['show_paging']);
-        $container->setParameter($this->getAlias() . '.max_results', $config['max_results']);
+        $container->setParameter($this->getAlias().'.show_paging', $config['show_paging']);
+        $container->setParameter($this->getAlias().'.max_results', $config['max_results']);
 
         if ($config['persistence']['phpcr']) {
             $loader->load('services.xml');
@@ -36,10 +36,10 @@ class CmfSearchExtension extends Extension
             $searchController = $container->getDefinition($this->getAlias().'.phpcr_controller');
             $searchController->replaceArgument(0, new Reference($config['persistence']['phpcr']['manager_registry']));
 
-            $container->setParameter($this->getAlias() . '.persistence.phpcr.manager_name', $config['persistence']['phpcr']['manager_name']);
-            $container->setParameter($this->getAlias() . '.persistence.phpcr.search_basepath', $config['persistence']['phpcr']['search_basepath']);
-            $container->setParameter($this->getAlias() . '.persistence.phpcr.search_fields', $config['persistence']['phpcr']['search_fields']);
-            $container->setParameter($this->getAlias() . '.persistence.phpcr.translation_strategy', $config['persistence']['phpcr']['translation_strategy']);
+            $container->setParameter($this->getAlias().'.persistence.phpcr.manager_name', $config['persistence']['phpcr']['manager_name']);
+            $container->setParameter($this->getAlias().'.persistence.phpcr.search_basepath', $config['persistence']['phpcr']['search_basepath']);
+            $container->setParameter($this->getAlias().'.persistence.phpcr.search_fields', $config['persistence']['phpcr']['search_fields']);
+            $container->setParameter($this->getAlias().'.persistence.phpcr.translation_strategy', $config['persistence']['phpcr']['translation_strategy']);
         }
     }
 
@@ -50,7 +50,7 @@ class CmfSearchExtension extends Extension
      */
     public function getXsdValidationBasePath()
     {
-        return __DIR__ . '/../Resources/config/schema';
+        return __DIR__.'/../Resources/config/schema';
     }
 
     public function getNamespace()
