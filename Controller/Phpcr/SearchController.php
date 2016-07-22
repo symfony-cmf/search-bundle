@@ -274,7 +274,7 @@ class SearchController implements SearchInterface
      *
      * @return mixed string(=locale) or bool(=false)
      */
-    public function queryLanguage($lang = null, Request $request)
+    public function queryLanguage($lang, Request $request)
     {
         if (!$this->restrictByLanguage) {
             return false;
